@@ -13,8 +13,10 @@ export async function GET() {
   try {
     const components = await getComponents();
     return NextResponse.json(components);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    // CORREÇÃO: Tipamos o erro como 'Error'
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -29,8 +31,10 @@ export async function POST(request: Request) {
     const { name, available } = await request.json();
     const newComponent = await addComponent(name, available);
     return NextResponse.json(newComponent, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    // CORREÇÃO: Tipamos o erro como 'Error'
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -45,8 +49,10 @@ export async function PUT(request: Request) {
         const { componentId, action } = await request.json();
         const updatedComponent = await updateStock(componentId, action);
         return NextResponse.json(updatedComponent);
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error) {
+        // CORREÇÃO: Tipamos o erro como 'Error'
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
 
@@ -61,7 +67,9 @@ export async function DELETE(request: Request) {
         const { componentId } = await request.json();
         await deleteComponent(componentId);
         return new NextResponse(null, { status: 204 });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error) {
+        // CORREÇÃO: Tipamos o erro como 'Error'
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }

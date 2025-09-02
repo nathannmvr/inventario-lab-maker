@@ -34,7 +34,8 @@ export const addComponent = async (name: string, available: number): Promise<Com
 
 // Atualiza o estoque de um componente
 export const updateStock = async (componentId: string, action: string): Promise<Component> => {
-    let components = await getComponents();
+    // CORREÇÃO: Trocamos 'let' por 'const' aqui
+    const components = await getComponents();
     const componentIndex = components.findIndex(c => c.id === componentId);
 
     if (componentIndex === -1) throw new Error("Component not found");
@@ -75,7 +76,8 @@ export const updateStock = async (componentId: string, action: string): Promise<
 
 // Deleta um componente
 export const deleteComponent = async (componentId: string): Promise<void> => {
-  let components = await getComponents();
+  // CORREÇÃO: Trocamos 'let' por 'const' aqui
+  const components = await getComponents();
   const updatedComponents = components.filter(c => c.id !== componentId);
   await kv.set("components", updatedComponents);
 };
