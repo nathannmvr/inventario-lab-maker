@@ -14,7 +14,6 @@ export async function GET() {
     const components = await getComponents();
     return NextResponse.json(components);
   } catch (error) {
-    // CORREÇÃO: Tipamos o erro como 'Error'
     const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
@@ -28,11 +27,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { name, available } = await request.json();
-    const newComponent = await addComponent(name, available);
+    // CORREÇÃO: Adicionamos 'defective' aqui
+    const { name, available, defective } = await request.json();
+    const newComponent = await addComponent(name, available, defective); // Passa o valor para o addComponent
     return NextResponse.json(newComponent, { status: 201 });
   } catch (error) {
-    // CORREÇÃO: Tipamos o erro como 'Error'
     const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
@@ -50,7 +49,6 @@ export async function PUT(request: Request) {
         const updatedComponent = await updateStock(componentId, action);
         return NextResponse.json(updatedComponent);
     } catch (error) {
-        // CORREÇÃO: Tipamos o erro como 'Error'
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
@@ -68,7 +66,6 @@ export async function DELETE(request: Request) {
         await deleteComponent(componentId);
         return new NextResponse(null, { status: 204 });
     } catch (error) {
-        // CORREÇÃO: Tipamos o erro como 'Error'
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }

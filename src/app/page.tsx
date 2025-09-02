@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { FaPlus, FaMinus, FaExclamationTriangle, FaWrench, FaTrash, FaGoogle, FaSignOutAlt, FaBoxOpen } from 'react-icons/fa';
+import { FaPlus, FaMinus, FaExclamationTriangle, FaWrench, FaTrash, FaGoogle, FaSignOutAlt, FaBoxOpen, FaRegEdit } from 'react-icons/fa';
 import type { Component } from '../lib/db';
 
 export default function Home() {
@@ -10,6 +10,7 @@ export default function Home() {
   const [components, setComponents] = useState<Component[]>([]);
   const [newComponentName, setNewComponentName] = useState('');
   const [newComponentAvailable, setNewComponentAvailable] = useState('0');
+  const [newComponentDefective, setNewComponentDefective] = useState('0'); // Novo campo para itens defeituosos
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchComponents = async () => {
@@ -32,11 +33,12 @@ export default function Home() {
   }, []);
 
   const handleAction = async (componentId: string, action: string) => {
-    const originalComponents = [...components];
+    const originalComponents = JSON.parse(JSON.stringify(components)); // Garante uma cópia profunda
     
+    // Otimização: Atualiza a UI imediatamente para uma sensação mais rápida
     const updatedComponents = components.map(c => {
         if (c.id === componentId) {
-            const newComp = JSON.parse(JSON.stringify(c));
+            const newComp = JSON.parse(JSON.stringify(c)); // Deep copy para evitar mutação direta
             switch (action) {
                 case 'INCREMENT_AVAILABLE': newComp.stock.available++; break;
                 case 'DECREMENT_AVAILABLE': if(newComp.stock.available > 0) newComp.stock.available--; break;
@@ -51,6 +53,7 @@ export default function Home() {
 
     setComponents(updatedComponents);
 
+    // Envia a requisição para a API em background
     try {
         const method = action === 'DELETE' ? 'DELETE' : 'PUT';
         const res = await fetch('/api/components', {
@@ -59,10 +62,14 @@ export default function Home() {
             body: JSON.stringify({ componentId, action }),
         });
         if (!res.ok) {
+            // Se a API falhar, reverte para o estado original
             setComponents(originalComponents);
+            console.error(`Falha ao executar ação ${action}. Revertendo estado.`);
         }
-    } catch {
+    } catch (error) {
+        // Se a API falhar, reverte para o estado original
         setComponents(originalComponents);
+        console.error(`Erro de rede ao executar ação ${action}:`, error);
     }
   };
   
@@ -73,11 +80,16 @@ export default function Home() {
     await fetch('/api/components', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newComponentName, available: newComponentAvailable }),
+      body: JSON.stringify({ 
+        name: newComponentName, 
+        available: newComponentAvailable,
+        defective: newComponentDefective // Inclui o campo defeituoso
+      }),
     });
     setNewComponentName('');
     setNewComponentAvailable('0');
-    fetchComponents();
+    setNewComponentDefective('0'); // Reseta o campo
+    fetchComponents(); // Re-busca da fonte para garantir consistência
   };
   
   const isAdmin = status === 'authenticated';
@@ -117,7 +129,7 @@ export default function Home() {
         {isAdmin && (
           <section className="mb-10 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-transparent dark:border-gray-700">
             <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Adicionar Novo Componente</h2>
-            <form onSubmit={handleAddComponent} className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+            <form onSubmit={handleAddComponent} className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
               <div className="sm:col-span-2">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-600 dark:text-gray-400">Nome do Componente</label>
                 <input
@@ -131,10 +143,9 @@ export default function Home() {
                 />
               </div>
               <div>
-                {/* A CORREÇÃO ESTÁ AQUI */}
-                <label htmlFor="quantity" className="block text-sm font-medium text-gray-600 dark:text-gray-400">Qtd. Inicial</label>
+                <label htmlFor="quantityAvailable" className="block text-sm font-medium text-gray-600 dark:text-gray-400">Qtd. Disponível Inicial</label>
                 <input
-                  id="quantity"
+                  id="quantityAvailable"
                   type="number"
                   min="0"
                   value={newComponentAvailable}
@@ -143,7 +154,19 @@ export default function Home() {
                   className="mt-1 block w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
-              <button type="submit" className="sm:col-span-3 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+              <div>
+                <label htmlFor="quantityDefective" className="block text-sm font-medium text-gray-600 dark:text-gray-400">Qtd. Defeituosa Inicial</label>
+                <input
+                  id="quantityDefective"
+                  type="number"
+                  min="0"
+                  value={newComponentDefective}
+                  onChange={(e) => setNewComponentDefective(e.target.value)}
+                  required
+                  className="mt-1 block w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <button type="submit" className="sm:col-span-4 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                 Adicionar ao Inventário
               </button>
             </form>
@@ -184,12 +207,13 @@ export default function Home() {
                         {isAdmin && (
                         <td className="p-4">
                             <div className="flex justify-center items-center gap-1 flex-wrap">
-                                <button title="Adicionar ao estoque" onClick={() => handleAction(comp.id, 'INCREMENT_AVAILABLE')} className="text-gray-500 hover:text-green-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaPlus size={12} /></button>
-                                <button title="Remover do estoque (uso)" onClick={() => handleAction(comp.id, 'DECREMENT_AVAILABLE')} className="text-gray-500 hover:text-gray-600 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaMinus size={12} /></button>
-                                <button title="Marcar como defeituoso" onClick={() => handleAction(comp.id, 'MARK_DEFECTIVE')} className="text-gray-500 hover:text-yellow-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaExclamationTriangle size={12} /></button>
-                                <button title="Marcar como reparado" onClick={() => handleAction(comp.id, 'MARK_REPAIRED')} className="text-gray-500 hover:text-blue-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaWrench size={12} /></button>
-                                <button title="Descartar defeituoso" onClick={() => handleAction(comp.id, 'DISCARD_DEFECTIVE')} className="text-gray-500 hover:text-orange-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaTrash size={12} /></button>
-                                <button title="Apagar componente" onClick={() => handleAction(comp.id, 'DELETE')} className="text-gray-500 hover:text-red-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaTrash size={12} /></button>
+                                {/* Botões de Ação com Tooltips */}
+                                <button title="Adicionar 1 ao estoque disponível" onClick={() => handleAction(comp.id, 'INCREMENT_AVAILABLE')} className="text-gray-500 hover:text-green-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaPlus size={12} /></button>
+                                <button title="Remover 1 do estoque disponível (uso)" onClick={() => handleAction(comp.id, 'DECREMENT_AVAILABLE')} className="text-gray-500 hover:text-gray-600 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaMinus size={12} /></button>
+                                <button title="Mover 1 para estoque defeituoso" onClick={() => handleAction(comp.id, 'MARK_DEFECTIVE')} className="text-gray-500 hover:text-yellow-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaExclamationTriangle size={12} /></button>
+                                <button title="Mover 1 de defeituoso para disponível (reparado/reposto)" onClick={() => handleAction(comp.id, 'MARK_REPAIRED')} className="text-gray-500 hover:text-blue-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaWrench size={12} /></button>
+                                <button title="Descartar 1 componente defeituoso (remove do inventário)" onClick={() => handleAction(comp.id, 'DISCARD_DEFECTIVE')} className="text-gray-500 hover:text-orange-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaTrash size={12} /></button>
+                                <button title="Apagar componente completamente" onClick={() => handleAction(comp.id, 'DELETE')} className="text-gray-500 hover:text-red-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaTrash size={12} /></button>
                             </div>
                         </td>
                         )}

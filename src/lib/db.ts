@@ -18,14 +18,15 @@ export const getComponents = async (): Promise<Component[]> => {
 };
 
 // Adiciona um novo componente
-export const addComponent = async (name: string, available: number): Promise<Component> => {
+// CORREÇÃO: Adicionamos 'defective' como parâmetro aqui
+export const addComponent = async (name: string, available: number, defective: number): Promise<Component> => {
   const components = await getComponents();
   const newComponent: Component = {
     id: uuidv4(),
     name,
     stock: {
       available: parseInt(String(available), 10),
-      defective: 0,
+      defective: parseInt(String(defective), 10), // Usamos o novo campo
     },
   };
   await kv.set("components", [...components, newComponent]);
@@ -34,7 +35,6 @@ export const addComponent = async (name: string, available: number): Promise<Com
 
 // Atualiza o estoque de um componente
 export const updateStock = async (componentId: string, action: string): Promise<Component> => {
-    // CORREÇÃO: Trocamos 'let' por 'const' aqui
     const components = await getComponents();
     const componentIndex = components.findIndex(c => c.id === componentId);
 
@@ -76,7 +76,6 @@ export const updateStock = async (componentId: string, action: string): Promise<
 
 // Deleta um componente
 export const deleteComponent = async (componentId: string): Promise<void> => {
-  // CORREÇÃO: Trocamos 'let' por 'const' aqui
   const components = await getComponents();
   const updatedComponents = components.filter(c => c.id !== componentId);
   await kv.set("components", updatedComponents);
