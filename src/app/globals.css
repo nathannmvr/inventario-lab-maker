@@ -1,9 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary-50: #e0f2e0; /* Verde bem claro para backgrounds sutis */
+  --color-primary-100: #b3dfb3;
+  --color-primary-500: #006633; /* Verde institucional do IF */
+  --color-primary-600: #005a2d; /* Verde um pouco mais escuro para hover */
+  --color-secondary-500: #ed1c24; /* Vermelho do IF */
+  --color-secondary-600: #d61a21; /* Vermelho para hover */
+
+  /* Cores para o tema claro */
+  --color-background-light: #ffffff; /* Branco puro */
+  --color-text-light: #1a1a1a; /* Quase preto para bom contraste */
+  --color-card-bg-light: #ffffff;
+  --color-border-light: #e5e7eb; /* Gray-200 */
 }
+
 
 @theme inline {
   --color-background: var(--background);
@@ -14,14 +25,22 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-background-dark: #121212; /* Um preto suave, não puro */
+    --color-text-dark: #e0e0e0; /* Branco suave para textos */
+    --color-card-bg-dark: #1f1f1f;
+    --color-border-dark: #374151; /* Gray-700 */
   }
 }
 
 body {
-  @apply bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+  background-color: var(--color-background-light);
+  color: var(--color-text-light);
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--color-background-dark);
+    color: var(--color-text-dark);
+  }
 }

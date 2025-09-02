@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { FaPlus, FaMinus, FaExclamationTriangle, FaWrench, FaTrash, FaGoogle, FaSignOutAlt, FaBoxOpen, FaRegEdit } from 'react-icons/fa';
+import { FaPlus, FaMinus, FaExclamationTriangle, FaWrench, FaTrash, FaGoogle, FaSignOutAlt, FaBoxOpen } from 'react-icons/fa';
 import type { Component } from '../lib/db';
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
   const [components, setComponents] = useState<Component[]>([]);
   const [newComponentName, setNewComponentName] = useState('');
   const [newComponentAvailable, setNewComponentAvailable] = useState('0');
-  const [newComponentDefective, setNewComponentDefective] = useState('0'); // Novo campo para itens defeituosos
+  const [newComponentDefective, setNewComponentDefective] = useState('0');
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchComponents = async () => {
@@ -83,40 +83,41 @@ export default function Home() {
       body: JSON.stringify({ 
         name: newComponentName, 
         available: newComponentAvailable,
-        defective: newComponentDefective // Inclui o campo defeituoso
+        defective: newComponentDefective
       }),
     });
     setNewComponentName('');
     setNewComponentAvailable('0');
-    setNewComponentDefective('0'); // Reseta o campo
-    fetchComponents(); // Re-busca da fonte para garantir consistência
+    setNewComponentDefective('0');
+    fetchComponents();
   };
   
   const isAdmin = status === 'authenticated';
 
   return (
     <div className="min-h-screen">
-      <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-sm sticky top-0 z-10">
+      <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-sm sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
                 <div className="flex items-center space-x-2">
-                    <FaBoxOpen className="h-8 w-8 text-indigo-500" />
-                    <span className="text-xl font-bold text-gray-800 dark:text-white">Inventário Maker</span>
+                    {/* LOGO DO IF (AQUI VOCÊ PODE INSERIR A IMAGEM REAL DO LOGO) */}
+                    <FaBoxOpen className="h-8 w-8 text-primary-500" />
+                    <span className="text-xl font-bold text-primary-500 dark:text-white">Inventário Maker IF</span>
                 </div>
                 {status === 'loading' ? (
-                  <div className="w-24 h-10 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse"></div>
+                  <div className="w-24 h-10 bg-primary-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                 ) : isAdmin ? (
                   <div className='flex items-center gap-4'>
                     <span className='text-sm text-gray-600 dark:text-gray-400 hidden sm:block'>
-                        {session.user?.name}
+                        Olá, {session.user?.name}
                     </span>
-                    <button onClick={() => signOut()} className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105">
+                    <button onClick={() => signOut()} className="flex items-center gap-2 bg-secondary-500 hover:bg-secondary-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105">
                       <FaSignOutAlt />
                       <span className="hidden sm:inline">Sair</span>
                     </button>
                   </div>
                 ) : (
-                  <button onClick={() => signIn('google')} className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105">
+                  <button onClick={() => signIn('google')} className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105">
                     <FaGoogle />
                     Login Admin
                   </button>
@@ -127,11 +128,11 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         {isAdmin && (
-          <section className="mb-10 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-transparent dark:border-gray-700">
+          <section className="mb-10 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-primary-100 dark:border-gray-700">
             <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Adicionar Novo Componente</h2>
             <form onSubmit={handleAddComponent} className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
               <div className="sm:col-span-2">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-600 dark:text-gray-400">Nome do Componente</label>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome do Componente</label>
                 <input
                   id="name"
                   type="text"
@@ -139,11 +140,11 @@ export default function Home() {
                   onChange={(e) => setNewComponentName(e.target.value)}
                   placeholder="Ex: Arduino Uno R3"
                   required
-                  className="mt-1 block w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="quantityAvailable" className="block text-sm font-medium text-gray-600 dark:text-gray-400">Qtd. Disponível Inicial</label>
+                <label htmlFor="quantityAvailable" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Qtd. Disponível Inicial</label>
                 <input
                   id="quantityAvailable"
                   type="number"
@@ -151,11 +152,11 @@ export default function Home() {
                   value={newComponentAvailable}
                   onChange={(e) => setNewComponentAvailable(e.target.value)}
                   required
-                  className="mt-1 block w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="quantityDefective" className="block text-sm font-medium text-gray-600 dark:text-gray-400">Qtd. Defeituosa Inicial</label>
+                <label htmlFor="quantityDefective" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Qtd. Defeituosa Inicial</label>
                 <input
                   id="quantityDefective"
                   type="number"
@@ -163,29 +164,29 @@ export default function Home() {
                   value={newComponentDefective}
                   onChange={(e) => setNewComponentDefective(e.target.value)}
                   required
-                  className="mt-1 block w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                 />
               </div>
-              <button type="submit" className="sm:col-span-4 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+              <button type="submit" className="sm:col-span-4 w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                 Adicionar ao Inventário
               </button>
             </form>
           </section>
         )}
 
-        <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-transparent dark:border-gray-700 overflow-hidden">
+        <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-primary-100 dark:border-gray-700 overflow-hidden">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Estoque de Componentes</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-gray-50 dark:bg-gray-700/50">
+              <thead className="bg-primary-50 dark:bg-gray-700/50">
                 <tr>
-                  <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300 uppercase tracking-wider">Componente</th>
-                  <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300 uppercase tracking-wider text-center">Disponível</th>
-                  <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300 uppercase tracking-wider text-center">Com Defeito</th>
-                  <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300 uppercase tracking-wider text-center">Total</th>
-                  {isAdmin && <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300 uppercase tracking-wider text-center">Ações</th>}
+                  <th className="p-4 font-semibold text-sm text-primary-600 dark:text-gray-300 uppercase tracking-wider">Componente</th>
+                  <th className="p-4 font-semibold text-sm text-primary-600 dark:text-gray-300 uppercase tracking-wider text-center">Disponível</th>
+                  <th className="p-4 font-semibold text-sm text-primary-600 dark:text-gray-300 uppercase tracking-wider text-center">Com Defeito</th>
+                  <th className="p-4 font-semibold text-sm text-primary-600 dark:text-gray-300 uppercase tracking-wider text-center">Total</th>
+                  {isAdmin && <th className="p-4 font-semibold text-sm text-primary-600 dark:text-gray-300 uppercase tracking-wider text-center">Ações</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -199,21 +200,20 @@ export default function Home() {
                     </tr>
                 ) : (
                     components.map(comp => (
-                    <tr key={comp.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                        <td className="p-4 font-medium whitespace-nowrap">{comp.name}</td>
+                    <tr key={comp.id} className="hover:bg-primary-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="p-4 font-medium whitespace-nowrap text-gray-900 dark:text-gray-200">{comp.name}</td>
                         <td className="p-4 text-center font-semibold text-green-600 dark:text-green-400">{comp.stock.available}</td>
                         <td className="p-4 text-center font-semibold text-yellow-600 dark:text-yellow-400">{comp.stock.defective}</td>
-                        <td className="p-4 text-center font-bold text-gray-800 dark:text-gray-200">{comp.stock.available + comp.stock.defective}</td>
+                        <td className="p-4 text-center font-bold text-gray-900 dark:text-gray-200">{comp.stock.available + comp.stock.defective}</td>
                         {isAdmin && (
                         <td className="p-4">
                             <div className="flex justify-center items-center gap-1 flex-wrap">
-                                {/* Botões de Ação com Tooltips */}
-                                <button title="Adicionar 1 ao estoque disponível" onClick={() => handleAction(comp.id, 'INCREMENT_AVAILABLE')} className="text-gray-500 hover:text-green-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaPlus size={12} /></button>
+                                <button title="Adicionar 1 ao estoque disponível" onClick={() => handleAction(comp.id, 'INCREMENT_AVAILABLE')} className="text-primary-500 hover:text-primary-600 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaPlus size={12} /></button>
                                 <button title="Remover 1 do estoque disponível (uso)" onClick={() => handleAction(comp.id, 'DECREMENT_AVAILABLE')} className="text-gray-500 hover:text-gray-600 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaMinus size={12} /></button>
-                                <button title="Mover 1 para estoque defeituoso" onClick={() => handleAction(comp.id, 'MARK_DEFECTIVE')} className="text-gray-500 hover:text-yellow-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaExclamationTriangle size={12} /></button>
-                                <button title="Mover 1 de defeituoso para disponível (reparado/reposto)" onClick={() => handleAction(comp.id, 'MARK_REPAIRED')} className="text-gray-500 hover:text-blue-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaWrench size={12} /></button>
-                                <button title="Descartar 1 componente defeituoso (remove do inventário)" onClick={() => handleAction(comp.id, 'DISCARD_DEFECTIVE')} className="text-gray-500 hover:text-orange-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaTrash size={12} /></button>
-                                <button title="Apagar componente completamente" onClick={() => handleAction(comp.id, 'DELETE')} className="text-gray-500 hover:text-red-500 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaTrash size={12} /></button>
+                                <button title="Mover 1 para estoque defeituoso" onClick={() => handleAction(comp.id, 'MARK_DEFECTIVE')} className="text-yellow-500 hover:text-yellow-600 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaExclamationTriangle size={12} /></button>
+                                <button title="Mover 1 de defeituoso para disponível (reparado/reposto)" onClick={() => handleAction(comp.id, 'MARK_REPAIRED')} className="text-blue-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaWrench size={12} /></button>
+                                <button title="Descartar 1 componente defeituoso (remove do inventário)" onClick={() => handleAction(comp.id, 'DISCARD_DEFECTIVE')} className="text-orange-500 hover:text-orange-600 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaTrash size={12} /></button>
+                                <button title="Apagar componente completamente" onClick={() => handleAction(comp.id, 'DELETE')} className="text-secondary-500 hover:text-secondary-600 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"><FaTrash size={12} /></button>
                             </div>
                         </td>
                         )}
