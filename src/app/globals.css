@@ -15,7 +15,6 @@
   --color-border-light: #e5e7eb; /* Gray-200 */
 }
 
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -25,22 +24,14 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-background-dark: #121212; /* Um preto suave, não puro */
-    --color-text-dark: #e0e0e0; /* Branco suave para textos */
-    --color-card-bg-dark: #1f1f1f;
-    --color-border-dark: #374151; /* Gray-700 */
+    --background: #0a0a0a;
+    --foreground: #ededed;
   }
 }
 
 body {
-  background-color: var(--color-background-light);
-  color: var(--color-text-light);
-  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: var(--color-background-dark);
-    color: var(--color-text-dark);
-  }
+  @apply bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
