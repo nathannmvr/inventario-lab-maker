@@ -80,3 +80,24 @@ export const deleteComponent = async (componentId: string): Promise<void> => {
   const updatedComponents = components.filter(c => c.id !== componentId);
   await kv.set("components", updatedComponents);
 };
+
+// Adicione estas funções ao final do arquivo src/lib/db.ts
+
+// Busca a lista de todos os administradores
+export const getAdmins = async (): Promise<string[]> => {
+  return await kv.smembers("admins");
+};
+
+// Adiciona um novo e-mail à lista de administradores
+export const addAdmin = async (email: string): Promise<number> => {
+  return await kv.sadd("admins", email);
+};
+
+// Remove um e-mail da lista de administradores
+export const removeAdmin = async (email: string): Promise<number> => {
+  // Medida de segurança: impede a remoção do admin principal definido no .env
+  if (email === process.env.FIRST_ADMIN_EMAIL) {
+    throw new Error("Cannot remove the primary administrator.");
+  }
+  return await kv.srem("admins", email);
+};
